@@ -38,15 +38,17 @@ Palette é uma aplicação Full Stack que analisa imagens e extrai automaticamen
 
 
 ## 🏗️ Arquitetura do Backend
+```
 paletteBack/
 └── src/main/java/com/palette/
-├── controller   → recebe as requisições HTTP
-├── service      → lógica de negócio e processamento de imagem
-├── dto
-│   └── response → objetos de resposta da API
-├── exception    → tratamento global de erros
-└── config       → configurações de CORS
+    ├── controller   → recebe as requisições HTTP
+    ├── service      → lógica de negócio e processamento de imagem
+    ├── dto
+    │   └── response → objetos de resposta da API
+    ├── exception    → tratamento global de erros
+    └── config       → configurações de CORS
+```
 
-
+---
 
 Desenvolvido por **Amanda Matias**
