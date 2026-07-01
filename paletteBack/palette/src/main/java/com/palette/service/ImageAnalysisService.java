@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
+import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.*;
@@ -22,7 +23,7 @@ public class ImageAnalysisService {
         int height = image.getHeight();
 
         List<int[]> pixels = extractPixels(image);
-        List<int[]> centroids = runKMeans(pixels, colorCount);
+        List<int[]> centroids = removeSimilarColors(runKMeans(pixels, colorCount));
 
         ColorInfo dominantColor = toColorInfo(centroids.get(0));
         List<ColorInfo> palette = centroids.stream()
@@ -45,6 +46,19 @@ public class ImageAnalysisService {
     }
 
     private List<int[]> extractPixels(BufferedImage image) {
+        int maxDimension = 150;
+        int width = image.getWidth();
+        int height = image.getHeight();
+
+        if (width > maxDimension || height > maxDimension) {
+            double scale = Math.min((double) maxDimension / width, (double) maxDimension / height);
+            int newWidth = (int) (width * scale);
+            int newHeight = (int) (height * scale);
+            BufferedImage resized = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_RGB);
+            resized.getGraphics().drawImage(image.getScaledInstance(newWidth, newHeight, Image.SCALE_FAST), 0, 0, null);
+            image = resized;
+        }
+
         List<int[]> pixels = new ArrayList<>();
         for (int y = 0; y < image.getHeight(); y++) {
             for (int x = 0; x < image.getWidth(); x++) {
@@ -61,7 +75,7 @@ public class ImageAnalysisService {
     private List<int[]> runKMeans(List<int[]> pixels, int k) {
         List<int[]> centroids = initializeCentroids(pixels, k);
 
-        for (int iteration = 0; iteration < 10; iteration++) {
+        for (int iteration = 0; iteration < 5; iteration++) {
             Map<Integer, List<int[]>> clusters = assignClusters(pixels, centroids);
             centroids = recalculateCentroids(clusters, k);
         }
@@ -121,6 +135,23 @@ public class ImageAnalysisService {
             newCentroids.add(new int[]{r, g, b});
         }
         return newCentroids;
+    }
+
+    private List<int[]> removeSimilarColors(List<int[]> centroids) {
+        List<int[]> distinct = new ArrayList<>();
+        for (int[] candidate : centroids) {
+            boolean isSimilar = false;
+            for (int[] kept : distinct) {
+                if (euclideanDistance(candidate, kept) < 15) {
+                    isSimilar = true;
+                    break;
+                }
+            }
+            if (!isSimilar) {
+                distinct.add(candidate);
+            }
+        }
+        return distinct;
     }
 
     private ColorInfo toColorInfo(int[] rgb) {
