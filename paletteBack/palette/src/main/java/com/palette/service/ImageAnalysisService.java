@@ -142,7 +142,7 @@ public class ImageAnalysisService {
         for (int[] candidate : centroids) {
             boolean isSimilar = false;
             for (int[] kept : distinct) {
-                if (euclideanDistance(candidate, kept) < 30) {
+                if (euclideanDistance(candidate, kept) < 50) {
                     isSimilar = true;
                     break;
                 }
