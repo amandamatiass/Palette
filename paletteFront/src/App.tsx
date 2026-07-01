@@ -40,7 +40,7 @@ export function App() {
 
     try {
       const result = await extractColors(file, 8);
-      setColors([result.dominantColor, ...result.palette]);
+      setColors(result.palette);
     } catch (error) {
       toast.error('Falha ao extrair cores');
       console.error(error);
