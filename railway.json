@@ -1,0 +1,6 @@
+{
+  "$schema": "https://schema.railway.app/railway.json",
+  "build": {
+    "rootDirectory": "paletteBack/palette"
+  }
+}
